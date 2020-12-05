@@ -1,5 +1,8 @@
 package com.handsome.switcher;
 
+/**
+ * 这个类是开关的定义类，就像beanDefinition那样的作用
+ */
 public class SwitcherDefinition {
     /**
      * 开关状态

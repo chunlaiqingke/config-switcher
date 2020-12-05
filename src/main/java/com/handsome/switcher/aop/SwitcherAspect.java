@@ -11,7 +11,7 @@ import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.util.StringUtils;
 
 /**
- * 完成开关方法代替的切面
+ * 完成开关方法代替的切面,就是调用加了注解的方法时会用到这个切面去从config中拿，如果拿不到或者执行失败，就返回方法的return值
  */
 @Aspect
 public class SwitcherAspect {
@@ -31,7 +31,9 @@ public class SwitcherAspect {
             }
             //从qconfig中拿取结果
             SwitcherDefinition configSwitcher = ApolloSwitcherProperties.getConfigSwitcher(bdName + "." + methodName);
-            //todo 过期时间和生效时间
+
+            //todo 过期时间和生效时间，现在过期时间和生效时间还没有实现，只实现了状态字段
+
             if(configSwitcher != null){
                 return configSwitcher.isState();
             }

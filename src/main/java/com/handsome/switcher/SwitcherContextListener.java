@@ -12,12 +12,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 /**
- * 加载所有配置了switcher直接的bean，然后在qconfig创建对象
+ * 这里是监听spring启动完成的消息，
+ * 加载所有配置了switcher注解的bean，
+ * 然后去config中创建配置
  */
 public class SwitcherContextListener implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -25,20 +25,18 @@ public class SwitcherContextListener implements ApplicationListener<ContextRefre
     public void onApplicationEvent(ContextRefreshedEvent event) {
         AbstractApplicationContext applicationContext = (AbstractApplicationContext)event.getApplicationContext();
         String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
-        StringJoiner methodJoiner = new StringJoiner("\n");
+        //apollo只支持单个配置的新增，所以这里只能循环去操作
         for (String bdName : beanDefinitionNames) {
             Class<?> type = applicationContext.getType(bdName);
-            joinMethod(methodJoiner, bdName, findMethod(bdName, type, Switcher.class));
+            appendUpdate(bdName, findMethod(bdName, type, Switcher.class));
         }
-        ApolloSwitcherProperties.appendUpdate(methodJoiner.toString());
     }
 
     /**
-     * jdk1.8+
      * @param methodsWithAnnotation
      * @return
      */
-    private void joinMethod(StringJoiner methodJoiner, String bdName, List<Method> methodsWithAnnotation){
+    private void appendUpdate(String bdName, List<Method> methodsWithAnnotation){
         for (Method method : methodsWithAnnotation) {
             //这里要用spring的反射去拿，而不可以自己使用字节码去拿，拿不到
             Switcher switcherAnno = AnnotationUtils.findAnnotation(method, Switcher.class);
@@ -46,7 +44,7 @@ public class SwitcherContextListener implements ApplicationListener<ContextRefre
             switcherDefinition.setState(switcherAnno.state());
             switcherDefinition.setExpiry(switcherAnno.expiry());
             switcherDefinition.setEffective(switcherAnno.effective());
-            methodJoiner.add(bdName + "." + method.getName() + "=" + JacksonUtil.toJSONString(switcherDefinition));
+            ApolloSwitcherProperties.appendUpdate(bdName + "." + method.getName(), JacksonUtil.toJSONString(switcherDefinition));
         }
     }
 
@@ -55,8 +53,7 @@ public class SwitcherContextListener implements ApplicationListener<ContextRefre
      * @return
      */
     private boolean configContains(String bdName, Method method){
-        Map<String, String> configSwitcherMap = ApolloSwitcherProperties.getConfigSwitcherMap();
-        return configSwitcherMap.containsKey(bdName + "." + method.getName());
+        return ApolloSwitcherProperties.containsKey(bdName + "." + method.getName());
     }
 
     /**

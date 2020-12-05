@@ -10,6 +10,7 @@ import org.springframework.core.type.AnnotationMetadata;
 
 /**
  * 针对springboot开发
+ * 这里是注入到宿主项目的spring容器中，配合EnableConfigSwitcher注解的@Import(ConfigSwitcherBeanDefinitionRegistrar.class)来完成的
  */
 public class ConfigSwitcherBeanDefinitionRegistrar implements ImportBeanDefinitionRegistrar {
     @Override
