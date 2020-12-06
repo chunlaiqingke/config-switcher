@@ -6,10 +6,13 @@ import com.ctrip.framework.apollo.openapi.client.ApolloOpenApiClient;
 import com.ctrip.framework.apollo.openapi.dto.OpenItemDTO;
 import com.handsome.ConfigSwitcherLogger;
 import com.handsome.switcher.SwitcherDefinition;
+import com.handsome.utils.DateUtil;
 import com.handsome.utils.JacksonUtil;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Properties;
 import java.util.Set;
 
@@ -71,6 +74,7 @@ public class ApolloSwitcherProperties {
         OpenItemDTO item = new OpenItemDTO();
         item.setKey(key);
         item.setValue(value);
-        client.createItem(appid, env, clusterName, FILE_NAME, item);
+        item.setDataChangeCreatedBy(DateUtil.toString(new Date()));
+        client.createItem(appid, env, clusterName, "config-switcher", item);
     }
 }
