@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -37,16 +38,18 @@ public class SwitcherContextListener implements ApplicationListener<ContextRefre
      * @return
      */
     private void appendUpdate(String bdName, List<Method> methodsWithAnnotation){
-        for (Method method : methodsWithAnnotation) {
-            //这里要用spring的反射去拿，而不可以自己使用字节码去拿，拿不到
-            Switcher switcherAnno = AnnotationUtils.findAnnotation(method, Switcher.class);
-            SwitcherDefinition switcherDefinition = new SwitcherDefinition();
-            switcherDefinition.setState(switcherAnno.state());
-            switcherDefinition.setExpiry(switcherAnno.expiry());
-            switcherDefinition.setEffective(switcherAnno.effective());
-            ApolloSwitcherProperties.appendUpdate(bdName + "." + method.getName(), JacksonUtil.toJSONString(switcherDefinition));
+        if(!CollectionUtils.isEmpty(methodsWithAnnotation)) {
+            for (Method method : methodsWithAnnotation) {
+                //这里要用spring的反射去拿，而不可以自己使用字节码去拿，拿不到
+                Switcher switcherAnno = AnnotationUtils.findAnnotation(method, Switcher.class);
+                SwitcherDefinition switcherDefinition = new SwitcherDefinition();
+                switcherDefinition.setState(switcherAnno.state());
+                switcherDefinition.setExpiry(switcherAnno.expiry());
+                switcherDefinition.setEffective(switcherAnno.effective());
+                ApolloSwitcherProperties.appendUpdate(bdName + "." + method.getName(), JacksonUtil.toJSONString(switcherDefinition));
+            }
+            ApolloSwitcherProperties.releaseNamespace();
         }
-        ApolloSwitcherProperties.releaseNamespace();
     }
 
     /**
