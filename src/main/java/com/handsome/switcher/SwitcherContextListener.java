@@ -46,6 +46,7 @@ public class SwitcherContextListener implements ApplicationListener<ContextRefre
             switcherDefinition.setEffective(switcherAnno.effective());
             ApolloSwitcherProperties.appendUpdate(bdName + "." + method.getName(), JacksonUtil.toJSONString(switcherDefinition));
         }
+        ApolloSwitcherProperties.releaseNamespace();
     }
 
     /**
