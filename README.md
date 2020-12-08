@@ -3,7 +3,7 @@
 
 # 这是一个完整的可配置的项目，但是还没有打到中央仓库
 ### 把项目打包（mvn install）到本地仓库，或者使用公司的gitlab的maven deploy按钮打包到公司的nexus
-项目中添加依赖
+项目中添加依赖(版本号按照自己的打包来)
 ```
 <dependency>
     <groupId>com.handsome</groupId>
@@ -31,7 +31,7 @@ apollo.openapi.appid=springbootdemo
 apollo.openapi.env=dev
 ```
 
-最后在apollo的项目中天健名称为config-switcher.properties的namespace即可
+最后在apollo的项目中添加名称为config-switcher.properties的namespace即可
 
 到这，项目的配置就结束了~~~~
 
